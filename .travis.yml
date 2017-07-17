@@ -1,0 +1,15 @@
+sudo: false
+language: php
+dist: trusty
+
+php:
+  - 7.0
+
+script: phpunit index.php
+
+notifications:
+  email:
+    recipients:
+      - aji@sepulsa.com
+    on_success: always
+    on_failure: never
