@@ -1,16 +1,31 @@
-sudo: false
+sudo: true
 language: php
-dist: trusty
 
 php:
-  - 5.6
-  - 7.0
+  - "7.0"
 
-script: phpunit index.php
+services:
+  - mysql
+
+before_install:
+  - mysql -e "CREATE DATABASE drupal;"
+  - mysql -e "GRANT ALL PRIVILEGES ON travis.* TO 'travis'@'%';"
+  - mysql -e "FLUSH PRIVILEGES;"
+
+install:
+  - php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > drush
+  - php drush core-status
+  - chmod +x drush
+  - mv drush "$HOME/bin" 
+
+script:
+  - drush dl drupal
+  - drush site-install standard --account-name=admin --account-pass=admin --db-url=mysql://travis@localhost/drupal
 
 notifications:
   email:
     recipients:
       - aji@sepulsa.com
-    on_success: always
-    on_failure: never
+    on_success: never
+    on_failure: always
+
